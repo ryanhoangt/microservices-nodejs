@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Schema, model } from "mongoose";
+import { Password } from "../services/password";
 
 /**
  * An interface that describes the properties that are required
@@ -36,6 +37,15 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+});
+
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    const hashed = await Password.toHash(this.password);
+    this.password = hashed;
+  }
+
+  next();
 });
 
 userSchema.statics.build = (attrs: UserAttrs) => {
