@@ -28,16 +28,29 @@ interface UserDoc extends Document {
   // ... other fields declared here
 }
 
-const userSchema = new Schema({
-  email: {
-    type: String, // JS's "S"tring, not TS's "s"tring
-    required: true,
+const userSchema = new Schema(
+  {
+    email: {
+      type: String, // JS's "S"tring, not TS's "s"tring
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  password: {
-    type: String,
-    required: true,
-  },
-});
+  {
+    toJSON: {
+      transform(doc, ret) {
+        // NOTE: perform view layer's tranformation
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.password;
+        delete ret.__v;
+      },
+    },
+  }
+);
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
