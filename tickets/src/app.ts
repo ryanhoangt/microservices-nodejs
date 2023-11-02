@@ -2,6 +2,8 @@ import express from "express";
 import "express-async-errors";
 import { json } from "body-parser";
 import cookieSession from "cookie-session";
+import { createTicketRouter } from "./routes/new";
+import { currentUser } from "@grider-ms-tickets/common";
 
 const app = express();
 
@@ -13,6 +15,9 @@ app.use(
     secure: true,
   })
 );
+
+app.use(currentUser);
+app.use(createTicketRouter);
 
 app.all("/api/users/*", () => {
   throw new NotFoundError();
